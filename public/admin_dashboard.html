@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>Admin Dashboard</h1>
+    <button onclick="logout()">Logout</button>
+    <section>
+      <h2>Pending User Requests</h2>
+      <ul id="pending-list"></ul>
+    </section>
+  </main>
+
+  <script>
+    fetch("/api/admin/pending")
+      .then(res => res.json())
+      .then(users => {
+        const list = document.getElementById("pending-list");
+        users.forEach(user => {
+          const li = document.createElement("li");
+          li.textContent = `${user.name} (${user.email}) `;
+          const btn = document.createElement("button");
+          btn.textContent = "Approve";
+          btn.onclick = () => {
+            fetch(`/api/admin/approve/${user._id}`, { method: "POST" }).then(() => location.reload());
+          };
+          li.appendChild(btn);
+          list.appendChild(li);
+        });
+      });
+
+    function logout() {
+      window.location.href = "/api/auth/logout";
+    }
+  </script>
+</body>
+</html>

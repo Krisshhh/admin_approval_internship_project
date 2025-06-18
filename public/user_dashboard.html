@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>User Dashboard</h1>
+    <p id="user-email">Loading...</p>
+    <button onclick="logout()">Logout</button>
+  </main>
+
+  <script>
+   fetch("/api/auth/me")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("user-email").textContent = `Logged in as: ${data.email}`;
+  }).catch(() => {
+    window.location.href = "/login.html";
+  });
+
+    function logout() {
+      window.location.href = "/api/auth/logout";
+    }
+  </script>
+</body>
+</html>
