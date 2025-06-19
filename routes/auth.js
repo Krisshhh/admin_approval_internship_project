@@ -6,7 +6,6 @@ const User = require("../models/user_model");
 const router = express.Router();
 const SECRET_KEY = "your_secret_key";
 
-// Signup Route
 router.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -20,8 +19,8 @@ router.post("/signup", async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      status: "pending",     // Set default status
-      role: "user"           // Set default role
+      status: "pending",
+      role: "user" 
     });
 
     await newUser.save();
@@ -31,21 +30,24 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// Login Route
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email });
-    console.log("Found user:", user); //debugging line
+    // console.log("Found user:", user); //debugging line
     
     if (!user) return res.status(401).json({ message: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
-    if (user.status !== "approved") {
-      return res.status(403).json({ message: "Not approved", status: user.status, role: user.role });
+    if (user.status === "rejected") {
+      return res.status(403).json({ message: "Your request was rejected. Contact admin.", status: user.status, role: user.role });
+    }
+
+    if (user.status === "pending") {
+      return res.status(403).json({ message: "Your account is still pending approval.", status: user.status, role: user.role });
     }
 
     const token = jwt.sign(
@@ -58,7 +60,7 @@ router.post("/login", async (req, res) => {
       sameSite: "Strict"
     });
 
-    console.log("Sending response with role:", user.role);
+    // console.log("Sending response with role:", user.role); //this was for debugging
 
     res.json({
       message: "Login successful",
@@ -71,7 +73,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Current logged in user
+//current logged in user
 router.get("/me", require("../middlewares/auth_middleware"), async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
@@ -82,10 +84,13 @@ router.get("/me", require("../middlewares/auth_middleware"), async (req, res) =>
   }
 });
 
-// Logout
 router.get("/logout", (req, res) => {
-  res.clearCookie("token");
-  res.redirect("/index.html");
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "Strict",
+    secure: false //false for http and true for https
+  });
+  res.redirect("/login.html");
 });
 
 module.exports = router;

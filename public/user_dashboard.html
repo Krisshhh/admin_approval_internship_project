@@ -14,16 +14,22 @@
   </main>
 
   <script>
-   fetch("/api/auth/me")
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("user-email").textContent = `Logged in as: ${data.email}`;
-  }).catch(() => {
-    window.location.href = "/login.html";
-  });
+    fetch("/api/auth/me")
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then(data => {
+        document.getElementById("user-email").textContent = `Logged in as: ${data.email}`;
+      })
+      .catch(() => {
+        window.location.href = "/login.html";
+      });
 
     function logout() {
-      window.location.href = "/api/auth/logout";
+      fetch("/api/auth/logout").then(() => {
+        window.location.href = "/login.html";
+      });
     }
   </script>
 </body>

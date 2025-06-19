@@ -20,12 +20,26 @@ mongoose.connect(process.env.MONGO_URI)
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 
-app.get("/user_dashboard.html", authMiddleware, (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "user_dashboard.html"));
+app.get("/user_dashboard.html", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "user") {
+      return res.redirect("/login.html");
+    }
+    res.sendFile(path.join(__dirname, "public", "user_dashboard.html"));
+  } catch (err) {
+    res.redirect("/login.html");
+  }
 });
 
-app.get("/admin_dashboard.html", authMiddleware, (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "admin_dashboard.html"));
+app.get("/admin_dashboard.html", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res.redirect("/login.html");
+    }
+    res.sendFile(path.join(__dirname, "public", "admin_dashboard.html"));
+  } catch (err) {
+    res.redirect("/login.html");
+  }
 });
 
 const PORT = process.env.PORT || 3000;
