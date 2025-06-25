@@ -8,6 +8,15 @@ const SECRET_KEY = "your_secret_key";
 
 router.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
+
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({
+      message:
+        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
+    });
+  }
+
   try {
     const existing = await User.findOne({ email });
     if (existing) {
@@ -20,7 +29,7 @@ router.post("/signup", async (req, res) => {
       email,
       password: hashedPassword,
       status: "pending",
-      role: "user" 
+      role: "user"
     });
 
     await newUser.save();
@@ -35,8 +44,7 @@ router.post("/login", async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    // console.log("Found user:", user); //debugging line
-    
+
     if (!user) return res.status(401).json({ message: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -60,8 +68,6 @@ router.post("/login", async (req, res) => {
       sameSite: "Strict"
     });
 
-    // console.log("Sending response with role:", user.role); //this was for debugging
-
     res.json({
       message: "Login successful",
       role: user.role,
@@ -73,7 +79,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-//current logged in user
 router.get("/me", require("../middlewares/auth_middleware"), async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
@@ -88,7 +93,7 @@ router.get("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     sameSite: "Strict",
-    secure: false //false for http and true for https
+    secure: false
   });
   res.redirect("/login.html");
 });
