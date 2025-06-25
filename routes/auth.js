@@ -93,4 +93,15 @@ router.get("/logout", (req, res) => {
   res.redirect("/login.html");
 });
 
+router.get("/check-email", async (req, res) => {
+  const { email } = req.query;
+  if (!email) return res.status(400).json({ available: false, message: "Email required" });
+
+  const user = await User.findOne({ email });
+  if (user) {
+    return res.json({ available: false, message: "Email already registered" });
+  }
+  return res.json({ available: true, message: "Email is available" });
+});
+
 module.exports = router;

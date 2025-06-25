@@ -4,9 +4,21 @@ const authMiddleware = require("../middlewares/auth_middleware");
 
 const router = express.Router();
 
-router.get("/pending", authMiddleware, async (req, res) => {
-  const users = await User.find({ status: "pending" });
-  res.json(users);
+router.get("/users", authMiddleware, async (req, res) => {
+  try {
+    const users = await User.find({});
+    const grouped = {
+      pending: [],
+      approved: [],
+      rejected: [],
+    };
+    users.forEach(user => {
+      if (grouped[user.status]) grouped[user.status].push(user);
+    });
+    res.json(grouped);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching users" });
+  }
 });
 
 router.post("/approve/:id", authMiddleware, async (req, res) => {
@@ -18,5 +30,4 @@ router.post("/reject/:id", authMiddleware, async (req, res) => {
   await User.findByIdAndUpdate(req.params.id, { status: "rejected" });
   res.json({ message: "User rejected" });
 });
-
 module.exports = router;

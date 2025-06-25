@@ -10,41 +10,74 @@
   <main>
     <h1>Admin Dashboard</h1>
     <button onclick="logout()">Logout</button>
+
     <section>
       <h2>Pending User Requests</h2>
       <ul id="pending-list"></ul>
     </section>
+
+    <section>
+      <h2>Approved Users</h2>
+      <ul id="approved-list"></ul>
+    </section>
+
+    <section>
+      <h2>Rejected Users</h2>
+      <ul id="rejected-list"></ul>
+    </section>
   </main>
 
   <script>
-    fetch("/api/admin/pending")
+    fetch("/api/admin/users")
       .then(res => {
         if (!res.ok) throw new Error();
         return res.json();
       })
-      .then(users => {
-        const list = document.getElementById("pending-list");
-        users.forEach(user => {
+      .then(data => {
+        const pendingList = document.getElementById("pending-list");
+        const approvedList = document.getElementById("approved-list");
+        const rejectedList = document.getElementById("rejected-list");
+
+        data.pending.forEach(user => {
           const li = document.createElement("li");
           li.textContent = `${user.name} (${user.email}) `;
-
           const approveBtn = document.createElement("button");
           approveBtn.textContent = "Approve";
           approveBtn.onclick = () => {
-            fetch(`/api/admin/approve/${user._id}`, { method: "POST" })
-              .then(() => location.reload());
+            fetch(`/api/admin/approve/${user._id}`, { method: "POST" }).then(() => location.reload());
           };
-
           const rejectBtn = document.createElement("button");
           rejectBtn.textContent = "Reject";
           rejectBtn.onclick = () => {
-            fetch(`/api/admin/reject/${user._id}`, { method: "POST" })
-              .then(() => location.reload());
+            fetch(`/api/admin/reject/${user._id}`, { method: "POST" }).then(() => location.reload());
           };
-
           li.appendChild(approveBtn);
           li.appendChild(rejectBtn);
-          list.appendChild(li);
+          pendingList.appendChild(li);
+        });
+
+        data.approved.forEach(user => {
+          const li = document.createElement("li");
+          li.textContent = `${user.name} (${user.email}) `;
+          const rejectBtn = document.createElement("button");
+          rejectBtn.textContent = "Reject";
+          rejectBtn.onclick = () => {
+            fetch(`/api/admin/reject/${user._id}`, { method: "POST" }).then(() => location.reload());
+          };
+          li.appendChild(rejectBtn);
+          approvedList.appendChild(li);
+        });
+
+        data.rejected.forEach(user => {
+          const li = document.createElement("li");
+          li.textContent = `${user.name} (${user.email}) `;
+          const approveBtn = document.createElement("button");
+          approveBtn.textContent = "Approve";
+          approveBtn.onclick = () => {
+            fetch(`/api/admin/approve/${user._id}`, { method: "POST" }).then(() => location.reload());
+          };
+          li.appendChild(approveBtn);
+          rejectedList.appendChild(li);
         });
       })
       .catch(() => window.location.href = "/login.html");
