@@ -1,7 +1,10 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const User = require("../models/user_model");
+const Token = require("../models/reset_token_model");
+const sendMail = require("../utils/mailer");
 
 const router = express.Router();
 const SECRET_KEY = "your_secret_key";
@@ -60,7 +63,7 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign(
       { userId: user._id, role: user.role },
-      "your_secret_key"
+      SECRET_KEY
     );
 
     res.cookie("token", token, {
@@ -107,6 +110,55 @@ router.get("/check-email", async (req, res) => {
     return res.json({ available: false, message: "Email already registered" });
   }
   return res.json({ available: true, message: "Email is available" });
+});
+
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email is required" });
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(404).json({ message: "No user with this email found" });
+  }
+
+  const token = crypto.randomBytes(32).toString("hex");
+  await Token.deleteOne({ userId: user._id });
+  await new Token({
+    userId: user._id,
+    token,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + 30 * 60 * 1000
+  }).save();
+
+  const resetLink = `http://localhost:3000/reset_pwd.html?token=${token}&id=${user._id}`;
+  await sendMail(user.email, "Reset Your Password", `Click the link to reset your password:\n${resetLink}`);
+
+  res.json({ message: "Reset password link has been sent on your registered email" });
+});
+
+router.post("/reset-password", async (req, res) => {
+  const { userId, token, newPassword } = req.body;
+
+  if (!userId || !token || !newPassword)
+    return res.status(400).json({ message: "Invalid request" });
+
+  const resetToken = await Token.findOne({ userId });
+  if (!resetToken || resetToken.token !== token)
+    return res.status(400).json({ message: "Invalid or expired token" });
+
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  if (!passwordRegex.test(newPassword)) {
+    return res.status(400).json({
+      message:
+        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.",
+    });
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await User.findByIdAndUpdate(userId, { password: hashedPassword });
+  await Token.deleteOne({ userId });
+
+  res.json({ message: "Password reset successful" });
 });
 
 module.exports = router;

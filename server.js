@@ -7,6 +7,7 @@ require("dotenv").config();
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const authMiddleware = require("./middlewares/auth_middleware");
+const resetRoutes = require("./routes/reset");
 
 const app = express();
 app.use(express.json());
@@ -19,6 +20,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/reset", resetRoutes);
 
 app.get("/user_dashboard.html", authMiddleware, async (req, res) => {
   try {

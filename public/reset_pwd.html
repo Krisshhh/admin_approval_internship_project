@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reset Password</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #f2f2f2;
+    }
+    main {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    #msg {
+      margin-top: 10px;
+      font-size: 0.95em;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h2>Reset Password</h2>
+    <form id="resetForm">
+      <input type="password" id="newPassword" placeholder="New Password" required />
+      <button type="submit">Set New Password</button>
+      <div id="msg"></div>
+    </form>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    const userId = params.get("id");
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+    document.getElementById("resetForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const newPassword = document.getElementById("newPassword").value;
+      const msg = document.getElementById("msg");
+
+      if (!passwordRegex.test(newPassword)) {
+        msg.textContent = "Password must be at least 8 characters with uppercase, lowercase, number, and special character.";
+        msg.style.color = "red";
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/auth/reset-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, token, newPassword })
+        });
+
+        const data = await res.json();
+        msg.textContent = data.message;
+        msg.style.color = res.ok ? "green" : "red";
+
+        if (res.ok) {
+          setTimeout(() => {
+            window.location.href = "/login.html";
+          }, 2000);
+        }
+      } catch (err) {
+        msg.textContent = "Something went wrong.";
+        msg.style.color = "red";
+      }
+    });
+  </script>
+</body>
+</html>
