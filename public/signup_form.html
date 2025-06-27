@@ -3,10 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign Up</title>
+  <title>Sign Up | ApproveDesk</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <nav class="navbar">
+    <div class="navbar-title">ApproveDesk</div>
+    <div class="nav-buttons">
+      <a href="login.html">Login</a>
+      <a href="signup_form.html">Sign Up</a>
+    </div>
+  </nav>
+
   <main>
     <h1>Sign Up</h1>
     <form id="signupForm">
@@ -19,21 +27,20 @@
   </main>
 
   <script>
+    const emailInput = document.getElementById("email");
+    const emailFeedback = document.getElementById("email-feedback");
 
-  const emailInput = document.getElementById("email");
-  const emailFeedback = document.getElementById("email-feedback");
+    emailInput.addEventListener("blur", () => {
+      const email = emailInput.value.trim();
+      if (!email) return;
 
-  emailInput.addEventListener("blur", () => {
-    const email = emailInput.value.trim();
-    if (!email) return;
-
-    fetch(`/api/auth/check-email?email=${encodeURIComponent(email)}`)
-      .then(res => res.json())
-      .then(data => {
-        emailFeedback.textContent = data.message;
-        emailFeedback.style.color = data.available ? "green" : "red";
-      });
-  });
+      fetch(`/api/auth/check-email?email=${encodeURIComponent(email)}`)
+        .then(res => res.json())
+        .then(data => {
+          emailFeedback.textContent = data.message;
+          emailFeedback.style.color = data.available ? "green" : "red";
+        });
+    });
 
     document.getElementById("signupForm").addEventListener("submit", async (e) => {
       e.preventDefault();

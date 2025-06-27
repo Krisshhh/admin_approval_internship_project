@@ -3,62 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Forgot Password</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 2rem;
-      max-width: 400px;
-      margin: auto;
-      text-align: center;
-    }
-
-    .signup-btn {
-      background-color: #add8e6;
-      border: none;
-      color: #000;
-      padding: 0.4rem 1rem;
-      border-radius: 25px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      margin-bottom: 1.5rem;
-      display: inline-block;
-    }
-
-    .signup-btn:hover {
-      background-color: #9acde3;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    input, button {
-      width: 100%;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
-      font-size: 1rem;
-    }
-
-    .note {
-      font-size: 0.9rem;
-      color: #555;
-      margin-bottom: 1rem;
-    }
-  </style>
+  <title>Forgot Password | ApproveDesk</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <button class="signup-btn" onclick="window.location.href='/signup_form.html'">Sign Up</button>
+  <nav class="navbar">
+    <div class="navbar-title">ApproveDesk</div>
+    <div class="nav-buttons">
+      <a href="login.html">Login</a>
+      <a href="signup_form.html">Sign Up</a>
+    </div>
+  </nav>
 
-  <h2>Forgot Password</h2>
-  <p class="note">We'll send a verification link to this email if it matches an existing account.</p>
-  
-  <form id="forgotForm">
-    <input type="email" name="email" placeholder="Enter your email" required />
-    <button type="submit">Send Reset Link</button>
-  </form>
+  <main>
+    <h2>Forgot Password</h2>
+    <p class="note">We'll send a verification link to this email if it matches an existing account.</p>
+
+    <form id="forgotForm">
+      <input type="email" name="email" placeholder="Enter your email" required />
+      <button type="submit">Send Reset Link</button>
+    </form>
+  </main>
 
   <script>
     document.getElementById("forgotForm").addEventListener("submit", async (e) => {

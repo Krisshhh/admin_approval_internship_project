@@ -3,95 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard</title>
+  <title>Admin Dashboard | ApproveDesk</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-    }
-
-    header.navbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background-color: #f5f5f5;
-      padding: 12px 24px;
-      border-bottom: 1px solid #ddd;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .navbar-title {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #333;
-      margin: 0 auto;
-    }
-
-    .logout-btn {
-      background-color: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      padding: 8px 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .logout-btn:hover {
-      background-color: #b02a37;
-    }
-
-    nav {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin: 1.5rem 0;
-    }
-
-    .nav-btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 25px;
-      background-color: #007bff;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      position: relative;
-      min-width: 160px;
-      text-align: center;
-    }
-
-    .nav-btn span.count {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: normal;
-      margin-top: 6px;
-      color: #e6e6e6;
-    }
-
-    section {
-      display: none;
-    }
-
-    section.active {
-      display: block;
-    }
-
-    li {
-      margin-bottom: 8px;
-    }
-  </style>
 </head>
 <body>
-  <header class="navbar">
-    <h1 class="navbar-title">Admin Dashboard</h1>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </header>
+  <nav class="navbar">
+    <div class="navbar-title">ApproveDesk</div>
+    <div class="nav-buttons">
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </nav>
 
   <main>
-    <nav>
+    <h1>Admin Dashboard</h1>
+
+    <nav class="section-nav">
       <button class="nav-btn" onclick="showSection('pending')">
         Pending Users
         <span class="count" id="pending-count">0</span>
@@ -144,7 +70,7 @@
 
         data.pending.forEach(user => {
           const li = document.createElement("li");
-          li.textContent = `${user.name} (${user.email}) `;
+          li.textContent = `${user.name} (${user.email})`;
           const approveBtn = document.createElement("button");
           approveBtn.textContent = "Approve";
           approveBtn.onclick = () => {
@@ -162,7 +88,7 @@
 
         data.approved.forEach(user => {
           const li = document.createElement("li");
-          li.textContent = `${user.name} (${user.email}) `;
+          li.textContent = `${user.name} (${user.email})`;
           const rejectBtn = document.createElement("button");
           rejectBtn.textContent = "Reject";
           rejectBtn.onclick = () => {
@@ -174,7 +100,7 @@
 
         data.rejected.forEach(user => {
           const li = document.createElement("li");
-          li.textContent = `${user.name} (${user.email}) `;
+          li.textContent = `${user.name} (${user.email})`;
           const approveBtn = document.createElement("button");
           approveBtn.textContent = "Approve";
           approveBtn.onclick = () => {
